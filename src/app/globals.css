@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root, :root[data-theme="dark"] {
+  --bg: #0A0C11;
+  --surface: #0F1218;
+  --surface2: #151922;
+  --surface3: #1C2230;
+  --border: #2A313C;
+  --border2: #343D4A;
+  --accent: #D9C7A6;
+  --accent-text: #D9C7A6;
+  --accent-ink: #0A0C11;
+  --accent2: #E9ECF2;
+  --green: #3ecf8e;
+  --yellow: #f5a623;
+  --red: #ff5f57;
+  --blue: #38bdf8;
+  --text: #E9ECF2;
+  --text2: #9BA3B0;
+  --muted: #5C6470;
+}
+
+:root[data-theme="light"] {
+  --bg: #FAFAF8;
+  --surface: #FFFFFF;
+  --surface2: #F1EFE9;
+  --surface3: #E9E6DD;
+  --border: #E4E1D8;
+  --border2: #D8D4C8;
+  --accent: #D9C7A6;
+  --accent-text: #7A6534;
+  --accent-ink: #3a2f12;
+  --accent2: #1A1C20;
+  --green: #1f9d63;
+  --yellow: #c47f12;
+  --red: #d83a33;
+  --blue: #1f7fc4;
+  --text: #1A1C20;
+  --text2: #5F5E58;
+  --muted: #9A988F;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+.glass { background: var(--surface); }

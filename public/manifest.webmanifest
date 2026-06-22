@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "Portal Cliente · Ctrl",
+  "short_name": "Portal Ctrl",
+  "description": "Portal de clientes de Skyline",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A0C11",
+  "theme_color": "#0A0C11",
+  "icons": [
+    { "src": "/ctrl-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
