@@ -55,6 +55,9 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
   const [assetList, setAssetList] = useState<any[]>(assets || [])
   const [tab, setTab] = useState<'entregables' | 'mis-archivos' | 'marca' | 'beta' | 'hosting' | 'firma' | 'metricas'>('entregables')
 
+  // Fecha de inicio del servicio (editable) con fallback a creación del registro
+  const desde = client.client_since || client.created_at
+
   // Próxima entrega: proyecto activo con end_date más cercana en el futuro
   const proyectos = projects || []
   const hoyStr = new Date().toISOString().slice(0, 10)
@@ -298,9 +301,9 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
               {client.industry && <span style={tagStyle}>{client.industry}</span>}
               {(client.services || []).map((s: string) => <span key={s} style={tagStyle}>{s}</span>)}
             </div>
-            {client.created_at && (
+            {desde && (
               <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--text2)', fontFamily: 'JetBrains Mono, monospace' }}>
-                📅 Cliente desde {fmtMesAnio(client.created_at)} · {mesesDesde(client.created_at)} {mesesDesde(client.created_at) === 1 ? 'mes' : 'meses'} con nosotros
+                📅 Cliente desde {fmtMesAnio(desde)} · {mesesDesde(desde)} {mesesDesde(desde) === 1 ? 'mes' : 'meses'} con nosotros
               </p>
             )}
           </div>
@@ -308,8 +311,8 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
 
         {/* Stats rápidos */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 24 }}>
-          <PortalStat label="Cliente desde" value={fmtMesAnio(client.created_at) || '—'} />
-          <PortalStat label="Con nosotros" value={`${mesesDesde(client.created_at)} ${mesesDesde(client.created_at) === 1 ? 'mes' : 'meses'}`} />
+          <PortalStat label="Cliente desde" value={fmtMesAnio(desde) || '—'} />
+          <PortalStat label="Con nosotros" value={`${mesesDesde(desde)} ${mesesDesde(desde) === 1 ? 'mes' : 'meses'}`} />
           <PortalStat label="Servicios activos" value={String((client.services || []).length || 0)} />
           <PortalStat label="Archivos compartidos" value={String(fileList.length)} />
         </div>
