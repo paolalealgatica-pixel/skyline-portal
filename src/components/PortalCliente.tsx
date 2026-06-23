@@ -184,7 +184,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
         </div>
       </div>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 980, margin: '0 auto', padding: '32px 24px' }}>
         {/* Bienvenida (hero estilo CRM) */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px 28px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 18 }}>
           {client.logo_url ? (
@@ -224,14 +224,13 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-          {[['entregables', '📦 Entregables'], ['mis-archivos', '📤 Mis archivos'], ['marca', '🎨 Mi marca'], ['beta', '🛠 Proyectos beta'], ['hosting', '🌐 Hosting'], ['firma', '✉️ Firma'], ['metricas', '📊 Métricas']].map(([key, label]) => (
+        <div style={{ display: 'flex', gap: 2, marginBottom: 22, borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
+          {[['entregables', '📦', 'Entregables'], ['mis-archivos', '📤', 'Mis archivos'], ['marca', '🎨', 'Mi marca'], ['beta', '🛠', 'Proyectos beta'], ['hosting', '🌐', 'Hosting'], ['firma', '✉️', 'Firma'], ['metricas', '📊', 'Métricas']].map(([key, icon, label]) => (
             <button key={key} onClick={() => setTab(key as any)}
-              style={{ padding: '10px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13.5,
-                background: tab === key ? 'var(--accent)' : 'var(--surface)',
-                color: tab === key ? 'var(--bg)' : 'var(--text2)',
-                outline: tab === key ? 'none' : '1px solid var(--border)' }}>
-              {label}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 16px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, whiteSpace: 'nowrap',
+                color: tab === key ? 'var(--text)' : 'var(--text2)',
+                borderBottom: `2px solid ${tab === key ? 'var(--accent)' : 'transparent'}`, marginBottom: -1 }}>
+              <span style={{ fontSize: 15 }}>{icon}</span> {label}
             </button>
           ))}
         </div>
