@@ -30,14 +30,14 @@ export default function LoginPage() {
               </g>
             </svg>
           </div>
-          <h1 style={{ fontFamily:'Inter, sans-serif', fontSize:'28px', fontWeight:'800', letterSpacing:'-0.5px', marginBottom:'6px', color:'var(--text)' }}>Ctrl</h1>
-          <p style={{ fontSize:'13px', color:'var(--text2)', fontFamily:'JetBrains Mono, monospace' }}>Agency Project Management</p>
+          <h1 style={{ fontFamily:'Inter, sans-serif', fontSize:'28px', fontWeight:'800', letterSpacing:'-0.5px', marginBottom:'8px', color:'var(--text)' }}>Ctrl</h1>
+          <span style={{ display:'inline-block', fontSize:'10px', fontWeight:'700', letterSpacing:'1px', textTransform:'uppercase', padding:'4px 12px', borderRadius:'20px', background:'var(--accent)', color:'var(--accent-ink)', fontFamily:'JetBrains Mono, monospace' }}>Portal Cliente</span>
         </div>
 
         {/* Card */}
         <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'16px', padding:'32px' }}>
-          <h2 style={{ fontSize:'17px', fontWeight:'700', marginBottom:'6px', color:'var(--text)' }}>Iniciar sesión</h2>
-          <p style={{ fontSize:'12.5px', color:'var(--text2)', marginBottom:'24px' }}>Accede con tu cuenta de Google. El sistema detectará si eres del equipo o cliente.</p>
+          <h2 style={{ fontSize:'17px', fontWeight:'700', marginBottom:'6px', color:'var(--text)' }}>Portal de clientes</h2>
+          <p style={{ fontSize:'12.5px', color:'var(--text2)', marginBottom:'24px' }}>Accede con el correo Google que registró tu agencia. Verás solo lo tuyo.</p>
 
           <button
             onClick={handleGoogleLogin}
@@ -60,8 +60,8 @@ export default function LoginPage() {
           </button>
 
           <div style={{ marginTop:'20px', padding:'12px', background:'var(--surface2)', borderRadius:'8px', fontSize:'11.5px', color:'var(--text2)', lineHeight:'1.6' }}>
-            <strong style={{ color:'var(--text)' }}>Equipo Ctrl:</strong> paola@skyline.cl / alonso@skyline.cl<br/>
-            <strong style={{ color:'var(--text)' }}>Clientes:</strong> Acceden con su propio Gmail — solo ven sus datos.
+            ¿Eres del <strong style={{ color:'var(--text)' }}>equipo Skyline</strong>?{' '}
+            <a href="https://skyline-hq.vercel.app" style={{ color:'var(--accent-text)', fontWeight:600 }}>Entra al panel →</a>
           </div>
         </div>
 
