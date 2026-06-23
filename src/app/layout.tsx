@@ -19,13 +19,13 @@ export const viewport: Viewport = {
 
 const NO_FLASH = `(function(){try{
   var m=document.cookie.match(/(?:^|; )theme=([^;]+)/);
-  var t=m?m[1]:(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+  var t=m?m[1]:'light';
   document.documentElement.setAttribute('data-theme',t);
-}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`
+}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
-  const theme = cookieStore.get('theme')?.value === 'light' ? 'light' : 'dark'
+  const theme = cookieStore.get('theme')?.value === 'dark' ? 'dark' : 'light'
   return (
     <html lang="es" data-theme={theme} suppressHydrationWarning>
       <head>

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import ThemeToggle from '@/components/ThemeToggle'
 
@@ -20,6 +20,14 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
   const [fileList, setFileList] = useState(files)
   const [assetList, setAssetList] = useState<any[]>(assets || [])
   const [tab, setTab] = useState<'entregables' | 'mis-archivos' | 'marca' | 'beta' | 'hosting' | 'firma' | 'metricas'>('entregables')
+
+  // Portal cliente: por defecto modo claro (si nunca eligió tema). El toggle se respeta.
+  useEffect(() => {
+    if (typeof document !== 'undefined' && !document.cookie.includes('theme=')) {
+      document.documentElement.setAttribute('data-theme', 'light')
+      document.cookie = 'theme=light; path=/; max-age=31536000; samesite=lax'
+    }
+  }, [])
 
   // Firma de correo (client_contacts)
   const existingContact = (contacts && contacts[0]) || null
