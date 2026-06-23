@@ -55,6 +55,8 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
   const [assetList, setAssetList] = useState<any[]>(assets || [])
   const [tab, setTab] = useState<'entregables' | 'mis-archivos' | 'marca' | 'beta' | 'hosting' | 'firma' | 'metricas'>('entregables')
 
+  const [logoError, setLogoError] = useState(false)
+
   // Fecha de inicio del servicio (editable) con fallback a creación del registro
   const desde = client.client_since || client.created_at
 
@@ -287,8 +289,8 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
 
         {/* Bienvenida (hero estilo CRM) */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px 28px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 18 }}>
-          {client.logo_url ? (
-            <img src={client.logo_url} alt="" style={{ width: 60, height: 60, borderRadius: 14, objectFit: 'cover', flexShrink: 0 }} />
+          {client.logo_url && !logoError ? (
+            <img src={client.logo_url} alt="" onError={() => setLogoError(true)} style={{ width: 60, height: 60, borderRadius: 14, objectFit: 'cover', flexShrink: 0 }} />
           ) : (
             <div style={{ width: 60, height: 60, borderRadius: 14, background: 'var(--surface2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: 'var(--accent-text)', flexShrink: 0 }}>
               {client.name.charAt(0).toUpperCase()}
