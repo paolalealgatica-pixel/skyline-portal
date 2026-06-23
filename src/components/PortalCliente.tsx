@@ -15,6 +15,40 @@ const tagStyle: React.CSSProperties = {
   background: 'var(--surface2)', color: 'var(--text2)', border: '1px solid var(--border)', textTransform: 'capitalize',
 }
 
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+function fmtMesAnio(d?: string) { if (!d) return ''; const x = new Date(d); return `${MESES[x.getMonth()]} ${x.getFullYear()}` }
+function mesesDesde(d?: string) { if (!d) return 0; const x = new Date(d); const n = new Date(); return Math.max(0, (n.getFullYear() - x.getFullYear()) * 12 + (n.getMonth() - x.getMonth())) }
+
+// Equipo Skyline (a quién contactar)
+const EQUIPO_SKYLINE = [
+  { nombre: 'Paola Leal', rol: 'Dirección de cuentas', email: 'paola@skylinemedia.io' },
+  { nombre: 'Alonso Vallejos', rol: 'Dirección de diseño', email: 'alonso@skylinemedia.io' },
+]
+
+const cardBox: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 24px' }
+const cardTitle: React.CSSProperties = { margin: '0 0 14px', fontSize: 11, color: 'var(--text2)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'JetBrains Mono, monospace' }
+
+function PortalStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ ...cardBox, padding: '16px 18px' }}>
+      <div style={{ fontSize: 10, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>{value}</div>
+    </div>
+  )
+}
+
+function PortalRow({ label, value, href }: { label: string; value?: string; href?: string }) {
+  if (!value) return null
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 13 }}>
+      <span style={{ color: 'var(--text2)', flexShrink: 0 }}>{label}</span>
+      {href
+        ? <a href={href} style={{ color: 'var(--accent-text)', textDecoration: 'none', fontWeight: 600, textAlign: 'right', wordBreak: 'break-all' }}>{value}</a>
+        : <span style={{ color: 'var(--text)', fontWeight: 600, textAlign: 'right', wordBreak: 'break-all' }}>{value}</span>}
+    </div>
+  )
+}
+
 export default function PortalCliente({ client, files, metrics, assets, contacts, userId }: any) {
   const [uploading, setUploading] = useState(false)
   const [fileList, setFileList] = useState(files)
@@ -209,7 +243,20 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
               {client.industry && <span style={tagStyle}>{client.industry}</span>}
               {(client.services || []).map((s: string) => <span key={s} style={tagStyle}>{s}</span>)}
             </div>
+            {client.created_at && (
+              <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--text2)', fontFamily: 'JetBrains Mono, monospace' }}>
+                📅 Cliente desde {fmtMesAnio(client.created_at)} · {mesesDesde(client.created_at)} {mesesDesde(client.created_at) === 1 ? 'mes' : 'meses'} con nosotros
+              </p>
+            )}
           </div>
+        </div>
+
+        {/* Stats rápidos */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 24 }}>
+          <PortalStat label="Cliente desde" value={fmtMesAnio(client.created_at) || '—'} />
+          <PortalStat label="Con nosotros" value={`${mesesDesde(client.created_at)} ${mesesDesde(client.created_at) === 1 ? 'mes' : 'meses'}`} />
+          <PortalStat label="Servicios activos" value={String((client.services || []).length || 0)} />
+          <PortalStat label="Archivos compartidos" value={String(fileList.length)} />
         </div>
 
         {/* Etapa del proyecto */}
@@ -226,6 +273,43 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
                   {i < STAGES.length - 1 && <div style={{ flex: 1, height: 2, background: i < stageIndex ? 'var(--accent)' : 'var(--border)' }} />}
                 </div>
                 <span style={{ fontSize: 11, color: i === stageIndex ? 'var(--accent)' : 'var(--text2)', textAlign: 'center', textTransform: 'capitalize', fontFamily: 'JetBrains Mono, monospace' }}>{stage}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Contacto: tus datos + equipo Skyline */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 28 }}>
+          <div style={cardBox}>
+            <h3 style={cardTitle}>Tus datos de contacto</h3>
+            {(() => {
+              const c = (contacts && contacts[0]) || null
+              const nombre = c ? `${c.first_name || ''} ${c.last_name || ''}`.trim() : null
+              const email = (c && c.email) || client.access_email
+              return (
+                <>
+                  <PortalRow label="Contacto" value={nombre || '—'} />
+                  {c?.role && <PortalRow label="Cargo" value={c.role} />}
+                  <PortalRow label="Email" value={email} href={email ? `mailto:${email}` : undefined} />
+                  {c?.phone && <PortalRow label="Teléfono" value={c.phone} href={`tel:${c.phone}`} />}
+                  <PortalRow label="Web" value={client.website} href={client.website} />
+                  <PortalRow label="Instagram" value={client.instagram} />
+                </>
+              )
+            })()}
+          </div>
+
+          <div style={cardBox}>
+            <h3 style={cardTitle}>Tu equipo Skyline</h3>
+            <p style={{ margin: '0 0 12px', fontSize: 12, color: 'var(--text2)' }}>¿Dudas o necesitas algo? Escríbenos directo.</p>
+            {EQUIPO_SKYLINE.map(p => (
+              <div key={p.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--surface2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'var(--accent-text)', flexShrink: 0 }}>{p.nombre.charAt(0)}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{p.nombre}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text2)' }}>{p.rol}</div>
+                </div>
+                <a href={`mailto:${p.email}`} style={{ fontSize: 12, color: 'var(--accent-text)', textDecoration: 'none', fontWeight: 600 }}>Escribir →</a>
               </div>
             ))}
           </div>
