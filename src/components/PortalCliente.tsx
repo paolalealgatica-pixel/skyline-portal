@@ -49,11 +49,55 @@ function PortalRow({ label, value, href }: { label: string; value?: string; href
   )
 }
 
-export default function PortalCliente({ client, files, metrics, assets, contacts, userId }: any) {
+export default function PortalCliente({ client, files, metrics, assets, contacts, projects, userId }: any) {
   const [uploading, setUploading] = useState(false)
   const [fileList, setFileList] = useState(files)
   const [assetList, setAssetList] = useState<any[]>(assets || [])
   const [tab, setTab] = useState<'entregables' | 'mis-archivos' | 'marca' | 'beta' | 'hosting' | 'firma' | 'metricas'>('entregables')
+
+  // Próxima entrega: proyecto activo con end_date más cercana en el futuro
+  const proyectos = projects || []
+  const hoyStr = new Date().toISOString().slice(0, 10)
+  const proximaEntrega = proyectos
+    .filter((p: any) => p.end_date && p.end_date >= hoyStr && p.status !== 'completed')
+    .sort((a: any, b: any) => a.end_date.localeCompare(b.end_date))[0] || null
+  const diasParaEntrega = proximaEntrega
+    ? Math.ceil((new Date(proximaEntrega.end_date + 'T12:00:00').getTime() - Date.now()) / 86400000)
+    : null
+
+  // Métricas destacadas: para cada (plataforma+label) tomar el último periodo y comparar con el anterior
+  const destacadas = (() => {
+    const groups: Record<string, any[]> = {}
+    for (const m of (metrics || [])) {
+      const k = `${m.platform || ''}|${m.label}`
+        ;(groups[k] = groups[k] || []).push(m)
+    }
+    const out: { label: string; platform?: string; value: string; delta: number | null }[] = []
+    for (const k of Object.keys(groups)) {
+      const arr = groups[k].sort((a, b) => String(b.period || '').localeCompare(String(a.period || '')))
+      const last = arr[0], prev = arr[1]
+      const n = (v: any) => { const x = parseFloat(String(v).replace(/[^\d.-]/g, '')); return isNaN(x) ? null : x }
+      const ln = n(last.value), pn = prev ? n(prev.value) : null
+      const delta = (ln !== null && pn !== null && pn !== 0) ? Math.round(((ln - pn) / pn) * 100) : null
+      out.push({ label: last.label, platform: last.platform, value: last.value, delta })
+    }
+    return out.slice(0, 4)
+  })()
+
+  // Línea de tiempo: entregables agrupados por mes (lo que ya recibió el cliente)
+  const timeline = (() => {
+    const entregables = (fileList || []).filter((f: any) => f.uploaded_by === 'agency')
+    const groups: Record<string, any[]> = {}
+    for (const f of entregables) {
+      const d = new Date(f.created_at)
+      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        ;(groups[k] = groups[k] || []).push(f)
+    }
+    return Object.keys(groups).sort((a, b) => b.localeCompare(a)).map(k => {
+      const [y, m] = k.split('-')
+      return { label: `${MESES[parseInt(m) - 1]} ${y}`, items: groups[k] }
+    })
+  })()
 
   // Portal cliente: por defecto modo claro (si nunca eligió tema). El toggle se respeta.
   useEffect(() => {
@@ -227,6 +271,17 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
       </div>
 
       <div style={{ maxWidth: 980, margin: '0 auto', padding: '32px 24px' }}>
+        {/* Mensaje del equipo (editable desde el panel) */}
+        {client.portal_message && (
+          <div style={{ background: 'var(--accent)', color: 'var(--accent-ink)', borderRadius: 14, padding: '16px 22px', marginBottom: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>💬</span>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.7, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace' }}>Mensaje de tu equipo</div>
+              <div style={{ fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{client.portal_message}</div>
+            </div>
+          </div>
+        )}
+
         {/* Bienvenida (hero estilo CRM) */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px 28px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 18 }}>
           {client.logo_url ? (
@@ -258,6 +313,45 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
           <PortalStat label="Servicios activos" value={String((client.services || []).length || 0)} />
           <PortalStat label="Archivos compartidos" value={String(fileList.length)} />
         </div>
+
+        {/* Próxima entrega */}
+        {proximaEntrega && (
+          <div style={{ ...cardBox, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16, borderLeft: '3px solid var(--accent)' }}>
+            <div style={{ fontSize: 26, flexShrink: 0 }}>🎯</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 11, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'JetBrains Mono, monospace', marginBottom: 4 }}>Próxima entrega</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>{proximaEntrega.name}</div>
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent-text)' }}>{diasParaEntrega === 0 ? 'Hoy' : diasParaEntrega === 1 ? 'Mañana' : `${diasParaEntrega} días`}</div>
+              <div style={{ fontSize: 11, color: 'var(--text2)', fontFamily: 'JetBrains Mono, monospace' }}>{new Date(proximaEntrega.end_date + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Métricas destacadas */}
+        {destacadas.length > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <h3 style={{ ...cardTitle, marginBottom: 12 }}>Tus resultados del último periodo</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
+              {destacadas.map((d, i) => (
+                <div key={i} style={cardBox}>
+                  <div style={{ fontSize: 10, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
+                    {d.platform ? `${d.platform} · ` : ''}{d.label}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{d.value}</span>
+                    {d.delta !== null && (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: d.delta >= 0 ? '#3ecf8e' : '#ff5f57' }}>
+                        {d.delta >= 0 ? '↑' : '↓'} {Math.abs(d.delta)}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Etapa del proyecto */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px 28px', marginBottom: 32 }}>
@@ -329,6 +423,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
 
         {/* Entregables */}
         {tab === 'entregables' && (
+          <>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 24 }}>
             <h3 style={{ margin: '0 0 20px', color: 'var(--text)' }}>Archivos listos para descargar</h3>
             {entregables.length === 0 ? (
@@ -353,6 +448,23 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
               </div>
             )}
           </div>
+
+          {timeline.length > 0 && (
+            <div style={{ ...cardBox, marginTop: 16 }}>
+              <h3 style={cardTitle}>Lo que hemos hecho juntos</h3>
+              {timeline.map((g, gi) => (
+                <div key={gi} style={{ display: 'flex', gap: 14, paddingBottom: gi < timeline.length - 1 ? 14 : 0 }}>
+                  <div style={{ width: 110, flexShrink: 0, fontSize: 12, fontWeight: 700, color: 'var(--accent-text)', textTransform: 'capitalize', paddingTop: 2 }}>{g.label}</div>
+                  <div style={{ flex: 1, borderLeft: '2px solid var(--border)', paddingLeft: 14 }}>
+                    {g.items.map((f: any) => (
+                      <div key={f.id} style={{ fontSize: 13, color: 'var(--text)', padding: '3px 0' }}>📄 {f.name}</div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          </>
         )}
 
         {/* Mis archivos */}

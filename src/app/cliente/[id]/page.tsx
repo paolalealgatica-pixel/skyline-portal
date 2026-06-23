@@ -50,5 +50,8 @@ export default async function ClientePortalPage({ params }: { params: Promise<{ 
   const { data: contacts } = await supabase
     .from('client_contacts').select('*').eq('client_id', id).order('created_at', { ascending: true })
 
-  return <PortalCliente client={client} files={files || []} metrics={metrics || []} assets={assets || []} contacts={contacts || []} userId={user.id} />
+  const { data: projects } = await supabase
+    .from('projects').select('*').eq('client_id', id).order('end_date', { ascending: true })
+
+  return <PortalCliente client={client} files={files || []} metrics={metrics || []} assets={assets || []} contacts={contacts || []} projects={projects || []} userId={user.id} />
 }
