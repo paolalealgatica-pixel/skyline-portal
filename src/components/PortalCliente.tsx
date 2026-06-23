@@ -10,6 +10,11 @@ const supabase = createBrowserClient(
 
 const STAGES = ['planificando', 'en curso', 'en revisión', 'finalizado']
 
+const tagStyle: React.CSSProperties = {
+  fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20,
+  background: 'var(--surface2)', color: 'var(--text2)', border: '1px solid var(--border)', textTransform: 'capitalize',
+}
+
 export default function PortalCliente({ client, files, metrics, assets, contacts, userId }: any) {
   const [uploading, setUploading] = useState(false)
   const [fileList, setFileList] = useState(files)
@@ -180,10 +185,23 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
       </div>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-        {/* Bienvenida */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '28px 32px', marginBottom: 32 }}>
-          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--text)' }}>Bienvenido, {client.name} 👋</h1>
-          <p style={{ margin: '8px 0 0', color: 'var(--text2)', fontSize: 14 }}>{client.company}</p>
+        {/* Bienvenida (hero estilo CRM) */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px 28px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 18 }}>
+          {client.logo_url ? (
+            <img src={client.logo_url} alt="" style={{ width: 60, height: 60, borderRadius: 14, objectFit: 'cover', flexShrink: 0 }} />
+          ) : (
+            <div style={{ width: 60, height: 60, borderRadius: 14, background: 'var(--surface2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: 'var(--accent-text)', flexShrink: 0 }}>
+              {client.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: 'var(--text)' }}>Bienvenido, {client.name} 👋</h1>
+            {client.company && <p style={{ margin: '4px 0 10px', color: 'var(--text2)', fontSize: 14 }}>{client.company}</p>}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {client.industry && <span style={tagStyle}>{client.industry}</span>}
+              {(client.services || []).map((s: string) => <span key={s} style={tagStyle}>{s}</span>)}
+            </div>
+          </div>
         </div>
 
         {/* Etapa del proyecto */}
