@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import ThemeToggle from '@/components/ThemeToggle'
+import Icon from '@/components/ui/Icon'
+import { Package, Upload, Palette, Wrench, Globe, Mail, BarChart3, MessageSquare, Calendar, Target, ArrowUp, ArrowDown, Check, FileText } from 'lucide-react'
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -279,7 +281,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
         {/* Mensaje del equipo (editable desde el panel) */}
         {client.portal_message && (
           <div style={{ background: 'var(--accent)', color: 'var(--accent-ink)', borderRadius: 14, padding: '16px 22px', marginBottom: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>💬</span>
+            <span style={{ flexShrink: 0, display:'flex' }}><Icon as={MessageSquare} size={18} /></span>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.7, marginBottom: 4, fontFamily: 'JetBrains Mono, monospace' }}>Mensaje de tu equipo</div>
               <div style={{ fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{client.portal_message}</div>
@@ -305,7 +307,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
             </div>
             {desde && (
               <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--text2)', fontFamily: 'JetBrains Mono, monospace' }}>
-                📅 Cliente desde {fmtMesAnio(desde)} · {mesesDesde(desde)} {mesesDesde(desde) === 1 ? 'mes' : 'meses'} con nosotros
+                <Icon as={Calendar} size={12} style={{verticalAlign:'-2px'}} /> Cliente desde {fmtMesAnio(desde)} · {mesesDesde(desde)} {mesesDesde(desde) === 1 ? 'mes' : 'meses'} con nosotros
               </p>
             )}
           </div>
@@ -322,7 +324,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
         {/* Próxima entrega */}
         {proximaEntrega && (
           <div style={{ ...cardBox, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16, borderLeft: '3px solid var(--accent)' }}>
-            <div style={{ fontSize: 26, flexShrink: 0 }}>🎯</div>
+            <div style={{ flexShrink: 0, color:'var(--accent-text)', display:'flex' }}><Icon as={Target} size={26} /></div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 11, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'JetBrains Mono, monospace', marginBottom: 4 }}>Próxima entrega</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>{proximaEntrega.name}</div>
@@ -348,7 +350,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
                     <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{d.value}</span>
                     {d.delta !== null && (
                       <span style={{ fontSize: 12, fontWeight: 700, color: d.delta >= 0 ? '#3ecf8e' : '#ff5f57' }}>
-                        {d.delta >= 0 ? '↑' : '↓'} {Math.abs(d.delta)}%
+                        <Icon as={d.delta >= 0 ? ArrowUp : ArrowDown} size={12} style={{verticalAlign:'-2px'}} /> {Math.abs(d.delta)}%
                       </span>
                     )}
                   </div>
@@ -367,7 +369,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
                 <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                   {i > 0 && <div style={{ flex: 1, height: 2, background: i <= stageIndex ? 'var(--accent)' : 'var(--border)' }} />}
                   <div style={{ width: 28, height: 28, borderRadius: '50%', background: i <= stageIndex ? 'var(--accent)' : 'var(--border)', border: i === stageIndex ? '3px solid var(--text)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--accent-ink)' }}>
-                    {i < stageIndex ? '✓' : ''}
+                    {i < stageIndex ? <Icon as={Check} size={14} /> : ''}
                   </div>
                   {i < STAGES.length - 1 && <div style={{ flex: 1, height: 2, background: i < stageIndex ? 'var(--accent)' : 'var(--border)' }} />}
                 </div>
@@ -416,12 +418,12 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 2, marginBottom: 22, borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
-          {[['entregables', '📦', 'Entregables'], ['mis-archivos', '📤', 'Mis archivos'], ['marca', '🎨', 'Mi marca'], ['beta', '🛠', 'Proyectos beta'], ['hosting', '🌐', 'Hosting'], ['firma', '✉️', 'Firma'], ['metricas', '📊', 'Métricas']].map(([key, icon, label]) => (
+          {([['entregables', Package, 'Entregables'], ['mis-archivos', Upload, 'Mis archivos'], ['marca', Palette, 'Mi marca'], ['beta', Wrench, 'Proyectos beta'], ['hosting', Globe, 'Hosting'], ['firma', Mail, 'Firma'], ['metricas', BarChart3, 'Métricas']] as [string, any, string][]).map(([key, icon, label]) => (
             <button key={key} onClick={() => setTab(key as any)}
               style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 16px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, whiteSpace: 'nowrap',
                 color: tab === key ? 'var(--text)' : 'var(--text2)',
                 borderBottom: `2px solid ${tab === key ? 'var(--accent)' : 'transparent'}`, marginBottom: -1 }}>
-              <span style={{ fontSize: 15 }}>{icon}</span> {label}
+              <Icon as={icon} size={16} /> {label}
             </button>
           ))}
         </div>
@@ -438,7 +440,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
                 {entregables.map((f: any) => (
                   <div key={f.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ fontSize: 24 }}>📄</span>
+                      <span style={{ color:'var(--text2)', display:'flex' }}><Icon as={FileText} size={24} /></span>
                       <div>
                         <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>{f.name}</p>
                         <p style={{ margin: 0, color: 'var(--text2)', fontSize: 12 }}>{f.size_bytes ? `${(f.size_bytes / 1024 / 1024).toFixed(2)} MB` : ''}</p>
@@ -462,7 +464,7 @@ export default function PortalCliente({ client, files, metrics, assets, contacts
                   <div style={{ width: 110, flexShrink: 0, fontSize: 12, fontWeight: 700, color: 'var(--accent-text)', textTransform: 'capitalize', paddingTop: 2 }}>{g.label}</div>
                   <div style={{ flex: 1, borderLeft: '2px solid var(--border)', paddingLeft: 14 }}>
                     {g.items.map((f: any) => (
-                      <div key={f.id} style={{ fontSize: 13, color: 'var(--text)', padding: '3px 0' }}>📄 {f.name}</div>
+                      <div key={f.id} style={{ fontSize: 13, color: 'var(--text)', padding: '3px 0', display:'flex', alignItems:'center', gap:6 }}><Icon as={FileText} size={14} /> {f.name}</div>
                     ))}
                   </div>
                 </div>
